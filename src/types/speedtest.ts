@@ -10,15 +10,27 @@ export type TestStage =
   | 'completed'
   | 'error';
 
+export type NetworkCategory =
+  | 'global_cdn'
+  | 'ggc'
+  | 'fna'
+  | 'iig'
+  | 'bdix'
+  | 'custom';
+
 export interface SpeedTestServer {
   id: string;
   name: string;
   location: string;
   provider: string;
+  category: NetworkCategory;
+  categoryLabel: string;
+  description: string;
   pingUrl: string;
   downloadUrl: (bytes: number) => string;
   uploadUrl: string;
   isCustom?: boolean;
+  routingInfo?: string;
 }
 
 export interface LatencyMetrics {
@@ -47,6 +59,8 @@ export interface SpeedTestResult {
     id: string;
     name: string;
     location: string;
+    category?: NetworkCategory;
+    categoryLabel?: string;
   };
   durationSeconds: number;
   networkInfo?: {
@@ -59,6 +73,15 @@ export interface SpeedTestResult {
     browser: string;
     os: string;
   };
+}
+
+export interface RouteProbeResult {
+  server: SpeedTestServer;
+  pingMs: number;
+  jitterMs: number;
+  status: 'idle' | 'testing' | 'success' | 'failed';
+  downloadMbps?: number;
+  error?: string;
 }
 
 export type ThemeMode = 'dark' | 'light' | 'system';

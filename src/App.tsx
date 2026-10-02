@@ -19,6 +19,7 @@ import { SpeedGauge } from './components/SpeedGauge';
 import { ResultCard } from './components/ResultCard';
 import { TestHistory } from './components/TestHistory';
 import { ServerSelector } from './components/ServerSelector';
+import { NetworkRouteSelector } from './components/NetworkRouteSelector';
 import { ThemeToggle } from './components/ThemeToggle';
 import { SplashScreen } from './components/SplashScreen';
 import {
@@ -319,6 +320,14 @@ export default function App() {
           </div>
         )}
 
+        {/* Network Route Selector (Global CDN, GGC, FNA, IIG, Local BDIX) */}
+        <NetworkRouteSelector
+          activeServer={activeServer}
+          onServerSelect={setActiveServer}
+          disabled={isTesting}
+          theme={activeTheme}
+        />
+
         {/* Central Speedometer Gauge */}
         <div className="w-full flex flex-col items-center">
           <SpeedGauge
@@ -403,16 +412,22 @@ export default function App() {
           </div>
           <div className="text-xs space-y-2 leading-relaxed text-slate-400">
             <p>
-              • <strong className="text-slate-200">Genuine Telemetry:</strong> This application measures real network transfer rates using hardware-level byte streams. No fake animations or randomized numbers are used.
+              • <strong className="text-cyan-300">Global CDN:</strong> Tests worldwide Anycast points-of-presence (Cloudflare, Fastly) for global browsing and web apps.
             </p>
             <p>
-              • <strong className="text-slate-200">Latency & RFC 3550 Jitter:</strong> Multiple lightweight HTTP probes measure round-trip time (RTT). Jitter is computed using statistical mean deviation between successive arrivals.
+              • <strong className="text-rose-300">Google Global Cache (GGC):</strong> Tests local ISP caching appliances for YouTube, Google Drive, Play Store, and Google Workspace streaming.
             </p>
             <p>
-              • <strong className="text-slate-200">Multi-Stream Download & Upload:</strong> Downloads use concurrent chunk streaming with <code className="text-cyan-400 font-mono">ReadableStream</code>, while uploads measure real binary payload transmission via <code className="text-emerald-400 font-mono">XMLHttpRequest.upload.onprogress</code>.
+              • <strong className="text-blue-300">Facebook Network Appliance (FNA):</strong> Tests intra-ISP Meta peering caches for Instagram Reels, Facebook HD video, and media delivery.
             </p>
             <p>
-              • <strong className="text-slate-200">Dedicated Node Architecture:</strong> You can configure custom local speed-test endpoints (such as regional nodes in Dhaka, Chittagong, Sylhet, Rajshahi, or internal ISP servers) directly from the server menu above.
+              • <strong className="text-emerald-300">Local BDIX:</strong> Measures direct domestic peering latency and bandwidth across the Bangladesh Internet Exchange (local ISP FTPs, live TV, OTT, and intra-country networks).
+            </p>
+            <p>
+              • <strong className="text-amber-300">International Gateway (IIG):</strong> Benchmarks upstream international submarine cable transit (SMW-4, SMW-5) and cross-border ITC links.
+            </p>
+            <p>
+              • <strong className="text-slate-200">Multi-Route Audit:</strong> Use the "Compare All 5 Routes" button above to probe latency and jitter across all peering paths simultaneously!
             </p>
           </div>
         </section>

@@ -29,13 +29,14 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, theme }) => {
   });
 
   const getShareText = () => {
+    const routeCategory = result.server.categoryLabel ? `Route: ${result.server.categoryLabel}\n` : '';
     return `Speed Test Result
 
 Download: ${result.downloadMbps} Mbps
 Upload: ${result.uploadMbps} Mbps
 Ping: ${result.pingMs} ms
 Jitter: ${result.jitterMs} ms
-Server: ${result.server.name} (${result.server.location})
+${routeCategory}Server: ${result.server.name} (${result.server.location})
 Tested on: ${formattedDate}`;
   };
 
@@ -179,10 +180,15 @@ Tested on: ${formattedDate}`;
         }`}
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-slate-800/40 pb-2">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <Server className="w-3.5 h-3.5 text-cyan-400" />
             <span className="font-semibold text-slate-400">Test Server:</span>
             <span className="font-medium text-slate-200">{result.server.name}</span>
+            {result.server.categoryLabel && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded font-mono font-medium bg-cyan-500/15 text-cyan-300 border border-cyan-500/25">
+                {result.server.categoryLabel}
+              </span>
+            )}
           </div>
           <span className="text-slate-400 text-[11px]">{result.server.location}</span>
         </div>

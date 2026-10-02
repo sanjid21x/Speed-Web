@@ -13,6 +13,13 @@ A lightweight, genuine, browser-based Internet Speed Test web application built 
 - **RFC 3550 Jitter Computation**: Standard statistical mean absolute deviation between successive packet arrivals.
 - **High-Precision Multi-Stream Download**: Streaming chunk transfers using `ReadableStream` and dynamic concurrency to saturate fiber broadband.
 - **Hardware-Level Upload Progress**: Measures physical payload transfer bytes in real-time via `XMLHttpRequest.upload.onprogress`.
+- **5 Specialized Test Routes**:
+  - 🌐 **Global CDN**: Cloudflare & Fastly global Anycast edge PoPs.
+  - ⚡ **Google Global Cache (GGC)**: Probes intra-ISP caching appliances for YouTube, Google Drive, and Play Store acceleration.
+  - 📱 **Facebook Network Appliance (FNA)**: Meta ISP peering appliances for Instagram Reels, Facebook video, and media CDN.
+  - 🚀 **Local BDIX**: Bangladesh Internet Exchange peering for domestic FTPs, local OTT, and intra-ISP bandwidth.
+  - 🌍 **International Gateway (IIG)**: Submarine cable transit (SMW-4, SMW-5) and international terrestrial cable links.
+- **Multi-Route Audit Matrix**: Test and compare latency and jitter across all 5 routing paths side-by-side in real time!
 - **Zero-Lag Circular Speedometer**: Custom SVG gauge with non-linear logarithmic calibration (0 to 1000+ Mbps) for intuitive readability on all speed tiers.
 - **Local History & Privacy**: Saves test results exclusively in your browser's `localStorage` with CSV export and zero server-side telemetry.
 - **One-Click Result Sharing**: Native Web Share API with instant formatted clipboard fallback.

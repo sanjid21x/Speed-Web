@@ -105,6 +105,8 @@ export class SpeedEngine {
           id: server.id,
           name: server.name,
           location: server.location,
+          category: server.category,
+          categoryLabel: server.categoryLabel,
         },
         durationSeconds: Number(totalDuration.toFixed(1)),
         networkInfo,
@@ -522,5 +524,46 @@ export class SpeedEngine {
     else if (ua.includes('Linux')) os = 'Linux';
 
     return { browser, os };
+  }
+
+  public static async probeServerLatency(
+    server: SpeedTestServer,
+    samplesCount: number = 3
+  ): Promise<{ min: number; avg: number; jitter: number }> {
+    const samples: number[] = [];
+    for (let i = 0; i < samplesCount; i++) {
+      const url = `${server.pingUrl}${server.pingUrl.includes('?') ? '&' : '?'}_t=${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+      const t0 = performance.now();
+      try {
+        await fetch(url, { method: 'HEAD', mode: 'cors', cache: 'no-store' }).catch(() =>
+          fetch(url, { mode: 'cors', cache: 'no-store' })
+        );
+        const dur = Math.max(1, performance.now() - t0);
+        samples.push(dur);
+      } catch {
+        // Continue
+      }
+      await new Promise((r) => setTimeout(r, 60));
+    }
+
+    if (samples.length === 0) {
+      throw new Error('Endpoint unreachable');
+    }
+
+    const min = Math.min(...samples);
+    const avg = samples.reduce((a, b) => a + b, 0) / samples.length;
+    let jitter = 0;
+    if (samples.length > 1) {
+      let diff = 0;
+      for (let i = 1; i < samples.length; i++) {
+        diff += Math.abs(samples[i] - samples[i - 1]);
+      }
+      jitter = diff / (samples.length - 1);
+    }
+    return {
+      min: Math.round(min),
+      avg: Math.round(avg),
+      jitter: Math.round(jitter),
+    };
   }
 }

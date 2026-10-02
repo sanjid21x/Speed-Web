@@ -124,9 +124,16 @@ export const TestHistory: React.FC<TestHistoryProps> = ({
                 <span className="font-semibold text-slate-200">
                   {dateStr} <span className="text-slate-500 font-normal">at {timeStr}</span>
                 </span>
-                <span className="text-[11px] text-slate-400 truncate max-w-[240px]">
-                  {item.server.name}
-                </span>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[11px] text-slate-400 truncate max-w-[200px]">
+                    {item.server.name}
+                  </span>
+                  {item.server.categoryLabel && (
+                    <span className="text-[9px] px-1.5 py-0.2 rounded font-mono font-medium bg-slate-800 text-cyan-300 border border-slate-700">
+                      {item.server.categoryLabel}
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className="flex items-center gap-4 sm:gap-6 font-mono">

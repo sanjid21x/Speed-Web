@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { SpeedTestServer } from '../types/speedtest';
+import { NetworkCategory, SpeedTestServer } from '../types/speedtest';
 import {
   getAllServers,
   saveCustomServer,
   deleteCustomServer,
   setSelectedServerId,
+  NETWORK_CATEGORIES,
 } from '../services/servers';
-import { Server, Plus, Globe, Trash2, X, CheckCircle, MapPin } from 'lucide-react';
+import { Server, Plus, Trash2, X, CheckCircle, MapPin, Tag } from 'lucide-react';
 
 interface ServerSelectorProps {
   activeServer: SpeedTestServer;
@@ -28,6 +29,7 @@ export const ServerSelector: React.FC<ServerSelectorProps> = ({
   // Form state for custom server
   const [formName, setFormName] = useState('');
   const [formLocation, setFormLocation] = useState('');
+  const [formCategory, setFormCategory] = useState<NetworkCategory>('bdix');
   const [formPingUrl, setFormPingUrl] = useState('');
   const [formDownloadUrl, setFormDownloadUrl] = useState('');
   const [formUploadUrl, setFormUploadUrl] = useState('');
@@ -60,8 +62,9 @@ export const ServerSelector: React.FC<ServerSelectorProps> = ({
     const newServer = saveCustomServer({
       id: `custom-${Date.now()}`,
       name: formName.trim(),
-      location: formLocation.trim() || 'Custom Regional Node',
-      provider: 'Custom Dedicated Node',
+      location: formLocation.trim() || 'Custom Node',
+      provider: 'Custom Dedicated Server',
+      category: formCategory,
       pingUrl: formPingUrl.trim(),
       downloadBaseUrl: formDownloadUrl.trim() || formPingUrl.trim(),
       uploadUrl: formUploadUrl.trim() || formPingUrl.trim(),
@@ -95,10 +98,12 @@ export const ServerSelector: React.FC<ServerSelectorProps> = ({
         }`}
       >
         <Server className="w-3.5 h-3.5 text-cyan-400" />
-        <span className="font-semibold text-slate-200 truncate max-w-[140px] sm:max-w-[180px]">
+        <span className="font-semibold text-slate-200 truncate max-w-[120px] sm:max-w-[170px]">
           {activeServer.name}
         </span>
-        <span className="text-slate-500 hidden sm:inline">({activeServer.location})</span>
+        <span className="text-[10px] px-1.5 py-0.2 rounded font-mono font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hidden sm:inline">
+          {activeServer.categoryLabel}
+        </span>
       </button>
 
       {/* Dropdown Menu */}
@@ -109,16 +114,19 @@ export const ServerSelector: React.FC<ServerSelectorProps> = ({
             onClick={() => setIsOpen(false)}
           />
           <div
-            className={`absolute right-0 sm:left-0 sm:right-auto mt-2 w-72 sm:w-80 rounded-2xl border p-2 shadow-2xl z-40 animate-fade-in ${
+            className={`absolute right-0 sm:left-0 sm:right-auto mt-2 w-80 sm:w-96 rounded-2xl border p-2 shadow-2xl z-40 animate-fade-in ${
               theme === 'dark'
                 ? 'bg-slate-900/95 border-slate-800 text-slate-100 backdrop-blur-xl'
                 : 'bg-white border-slate-200 text-slate-800 shadow-slate-200'
             }`}
           >
             <div className="flex items-center justify-between px-3 py-2 border-b border-slate-800/40">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Select Test Endpoint
-              </span>
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  Select Test Endpoint
+                </span>
+                <p className="text-[10px] text-slate-500">Global CDN, GGC, FNA, IIG, BDIX</p>
+              </div>
               <button
                 onClick={() => {
                   setIsOpen(false);
@@ -131,7 +139,7 @@ export const ServerSelector: React.FC<ServerSelectorProps> = ({
               </button>
             </div>
 
-            <div className="max-h-60 overflow-y-auto divide-y divide-slate-800/20 py-1">
+            <div className="max-h-72 overflow-y-auto divide-y divide-slate-800/20 py-1">
               {servers.map((srv) => {
                 const isSelected = srv.id === activeServer.id;
                 return (
@@ -153,13 +161,16 @@ export const ServerSelector: React.FC<ServerSelectorProps> = ({
                         <span className="font-semibold text-xs truncate">
                           {srv.name}
                         </span>
+                        <span className="text-[9px] px-1.5 py-0.2 rounded font-mono font-medium bg-slate-800 text-slate-300 border border-slate-700">
+                          {srv.categoryLabel}
+                        </span>
                         {srv.isCustom && (
                           <span className="text-[9px] px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300">
                             Custom
                           </span>
                         )}
                       </div>
-                      <span className="text-[10px] text-slate-500 truncate">
+                      <span className="text-[10px] text-slate-400 truncate">
                         {srv.location}
                       </span>
                     </div>
@@ -184,8 +195,8 @@ export const ServerSelector: React.FC<ServerSelectorProps> = ({
               })}
             </div>
 
-            <div className="p-2 border-t border-slate-800/40 text-[10px] text-slate-500 italic">
-              Supports dedicated local speed-test endpoints (e.g., Dhaka, Chittagong, Sylhet, etc.) with custom CORS endpoints.
+            <div className="p-2 border-t border-slate-800/40 text-[10px] text-slate-500">
+              Supports dedicated local peering (BDIX), Google GGC, Meta FNA, and International IIG gateways.
             </div>
           </div>
         </>
@@ -204,7 +215,7 @@ export const ServerSelector: React.FC<ServerSelectorProps> = ({
             <div className="flex items-center justify-between pb-3 border-b border-slate-800/50">
               <div className="flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-base font-bold">Add Custom Regional Node</h3>
+                <h3 className="text-base font-bold">Add Custom Speed Node</h3>
               </div>
               <button
                 onClick={() => setShowAddModal(false)}
@@ -217,12 +228,29 @@ export const ServerSelector: React.FC<ServerSelectorProps> = ({
             <form onSubmit={handleSaveCustom} className="space-y-3 mt-4 text-xs">
               <div>
                 <label className="block text-slate-400 font-medium mb-1">
+                  Routing Category *
+                </label>
+                <select
+                  value={formCategory}
+                  onChange={(e) => setFormCategory(e.target.value as NetworkCategory)}
+                  className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-slate-100 focus:outline-none focus:border-cyan-500"
+                >
+                  {NETWORK_CATEGORIES.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name} ({cat.tag})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-400 font-medium mb-1">
                   Server Name *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Dhaka Fiber Node or Local ISP"
+                  placeholder="e.g. Circle Network BDIX or Local ISP Node"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-slate-100 focus:outline-none focus:border-cyan-500"
@@ -249,7 +277,7 @@ export const ServerSelector: React.FC<ServerSelectorProps> = ({
                 <input
                   type="url"
                   required
-                  placeholder="https://example.com/ping"
+                  placeholder="https://speed.your-isp.net/ping"
                   value={formPingUrl}
                   onChange={(e) => setFormPingUrl(e.target.value)}
                   className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-slate-100 focus:outline-none focus:border-cyan-500 font-mono text-[11px]"
@@ -262,7 +290,7 @@ export const ServerSelector: React.FC<ServerSelectorProps> = ({
                 </label>
                 <input
                   type="url"
-                  placeholder="https://example.com/download?bytes={bytes}"
+                  placeholder="https://speed.your-isp.net/download?bytes={bytes}"
                   value={formDownloadUrl}
                   onChange={(e) => setFormDownloadUrl(e.target.value)}
                   className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-slate-100 focus:outline-none focus:border-cyan-500 font-mono text-[11px]"
@@ -275,7 +303,7 @@ export const ServerSelector: React.FC<ServerSelectorProps> = ({
                 </label>
                 <input
                   type="url"
-                  placeholder="https://example.com/upload"
+                  placeholder="https://speed.your-isp.net/upload"
                   value={formUploadUrl}
                   onChange={(e) => setFormUploadUrl(e.target.value)}
                   className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-slate-100 focus:outline-none focus:border-cyan-500 font-mono text-[11px]"
